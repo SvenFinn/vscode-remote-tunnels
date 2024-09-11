@@ -1,26 +1,28 @@
-FROM ubuntu:24.04
-
-LABEL maintainer.name="Matteo Pietro Dazzi" \
-    maintainer.email="matteopietro.dazzi@gmail.com" \
-    version="1.0.0" \
-    description="VSCode remote tunnels Docker image that can be easily deployed everywhere you want"
+FROM ubuntu:latest
 
 ENV MACHINE_NAME=vscode-remote
 
-ARG TARGETARCH
-ARG BUILD=stable
+WORKDIR /tmp
 
-COPY src/* /usr/local/bin/
-
-RUN apt-get update && \
-    export DEBIAN_FRONTEND=noninteractive && \
+RUN export DEBIAN_FRONTEND=noninteractive;\ 
+    apt-get update; \
     apt-get install -y --no-install-recommends \
-    tzdata \
-    curl ca-certificates \
-    git build-essential && \
-    apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* && \
-    download_vscode $TARGETARCH $BUILD
+    tzdata ca-certificates git build-essential curl ca-certificates gnome-keyring; \
+    curl -sL "https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64" --output /tmp/vscode-cli.tar.gz; \
+    tar -xf /tmp/vscode-cli.tar.gz -C /usr/bin; \
+    rm /tmp/vscode-cli.tar.gz;
 
-WORKDIR /home/workspace
+RUN export DEBIAN_FRONTEND=noninteractive; \
+    apt-get install -y --no-install-recommends \
+    nodejs npm python3 python3-pip python3-venv; \
+    npm install -g --loglevel=info n; \
+    n stable; \
+    npm install -g --loglevel=info nodemon n ts-node typescript; 
 
-ENTRYPOINT [ "entrypoint" ]
+COPY src/entrypoint /usr/local/bin/
+
+USER root
+
+VOLUME [ "/root" ]
+
+ENTRYPOINT [ "entrypoint"]
