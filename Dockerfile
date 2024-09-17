@@ -19,7 +19,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
     n stable; \
     npm install -g --loglevel=info nodemon n ts-node typescript; 
 
-COPY src/entrypoint /usr/local/bin/
+COPY src/entrypoint src/install-vscode-extensions /usr/local/bin/
 
 USER root
 

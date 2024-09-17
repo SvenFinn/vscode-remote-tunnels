@@ -1,0 +1,24 @@
+#!/bin/bash
+
+extensions="$(cat ~/extensions.list)"
+
+installed_extensions="$(code --list-extensions | tail -n +2)"
+
+if [ $? -ne 0 ]; then
+  echo "Error: Visual Studio Code is not installed."
+  exit 1
+fi
+
+for extension in $installed_extensions; do
+  if [[ ! $extensions =~ $extension ]]; then
+    code --uninstall-extension $extension
+  fi
+done
+
+for extension in $extensions; do
+  if [[ ! $installed_extensions =~ $extension ]]; then
+    code --install-extension $extension
+  fi
+done
+
+code --list-extensions | tail -n +2 > ~/extensions.list

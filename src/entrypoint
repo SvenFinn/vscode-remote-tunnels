@@ -1,3 +1,9 @@
 #!/bin/bash
 
+if [ -e ~/extensions.list ];
+then
+    echo "Installing extensions"
+    install-vscode-extensions
+fi
+
 code tunnel --accept-server-license-terms --name $MACHINE_NAME --verbose
